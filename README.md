@@ -1,5 +1,4 @@
 # BlogDjango
-BlogDjango
 
 ## Description
 
