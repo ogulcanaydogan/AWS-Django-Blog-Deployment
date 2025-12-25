@@ -1,79 +1,107 @@
-# BlogDjango
+# BlogDjango - Scalable Django Deployment on AWS
 
-## Description
+Production-oriented deployment of a Django-based blog application on AWS, designed to demonstrate high availability, secure networking, and scalable infrastructure using managed AWS services.
 
-The TechPro Education Blog Page Application aims to deploy blog application as a web application written Django Framework on AWS Cloud Infrastructure. This infrastructure has Application Load Balancer with Auto Scaling Group of Elastic Compute Cloud (EC2) Instances and Relational Database Service (RDS) on defined VPC. Also, The Cloudfront and Route 53 services are located in front of the architecture and manage the traffic in secure. User is able to upload pictures and videos on own blog page and these are kept on S3 Bucket. This architecture will be created by Firms DevOps Guy.
+## Overview
+This project showcases how a Django web application can be deployed in a production-like AWS environment using an Application Load Balancer, Auto Scaling EC2 instances, and an RDS MySQL database inside a custom VPC. Static and media assets are stored on Amazon S3, distributed securely via CloudFront, and exposed to users through Route 53 with failover support.
 
-## Problem Statement
+The infrastructure and deployment flow reflect the responsibilities of a DevOps engineer operating a real-world web platform.
 
-- Your company has recently ended up a project that aims to serve as Blog web application on isolated VPC environment. You and your colleagues have started to work on the project. Your Developer team has developed the application and you are going to deploy the app in production environment.
+---
 
-- Application is coded by TechPro Education Fullstack development team and given you as DevOps team. App allows users to write their own blog page to whom user registration data should be kept in separate MySQL database in AWS RDS service and pictures or videos should be kept in S3 bucket. The object list of S3 Bucket containing movies and videos is recorded on DynamoDB table. 
+## Architecture Summary
+- Custom VPC with public and private subnets
+- Application Load Balancer in front of EC2 Auto Scaling Group
+- EC2 instances running Django application
+- Amazon RDS (MySQL 8.0.28) for relational data
+- Amazon S3 for static assets and user-uploaded media
+- Amazon CloudFront for global content delivery
+- Amazon Route 53 with DNS and failover configuration
+- DynamoDB table for tracking S3 object metadata
+- AWS Lambda triggered by S3 events
 
-- The web application will be deployed using Django framework.
+---
 
-- The Web Application should be accessible via web browser from anywhere in secure.
+## Problem Context
+A Django blog application developed by a frontend/backend team must be deployed into a secure and highly available production environment. The DevOps responsibility includes:
 
-- You are requested to push your program to the project repository on the Github. You are going to pull it into the webservers in the production environment on AWS Cloud. 
+- Designing isolated network infrastructure
+- Deploying and scaling the application
+- Securing traffic and data
+- Integrating managed AWS services for reliability and performance
 
-In the architecture, you can configure your infrastructure using the followings,
+The application must be accessible securely from anywhere via a web browser.
 
-# Blog Project Tasks
+---
 
-## Infrastructure Setup
+## Infrastructure Components
 
-1. **Create VPC and all components**
-   - Create VPC
-   - Create Subnets
-   - Create and attach an internet gateway
-   - Create Route Tables
-   - Create Endpoint
+### Networking
+- Custom VPC
+- Public and private subnets
+- Internet Gateway
+- Route tables and endpoints
 
-2. **Create Security Groups (ALB ---> EC2 ---> RDS)**
-   - ALB Security Group
-   - EC2 Security Groups
-   - RDS Security Groups
-   - NAT Instance Security Group
+### Security
+- Dedicated security groups for:
+  - Application Load Balancer
+  - EC2 instances
+  - RDS database
+  - NAT instance
+- Least-privilege traffic flow (ALB -> EC2 -> RDS)
 
-3. **Create RDS**
-   - Create a subnet group for our custom VPC
-   - Create Database
-     - Database engine: `MySQL`
-     - Version: `8.0.28`
+### Compute and Scaling
+- EC2 Launch Template
+- Auto Scaling Group
+- User data scripts for automated instance bootstrap
+- NAT instance in public subnet
 
-4. **Create two S3 Buckets and set one of these as static website**
-   - Failover Scenario
-   - Web Site
+### Data Layer
+- Amazon RDS
+  - Engine: MySQL
+  - Version: 8.0.28
+  - Subnet group in private subnets
 
-## Application Deployment
+### Storage and Content Delivery
+- Two S3 buckets:
+  - Media uploads
+  - Static website hosting
+- CloudFront distribution in front of ALB and S3
+- Route 53 DNS with failover routing
 
-5. **Copy files downloaded or cloned from Techproeducation repo on Github**
-6. **Prepare your Github repository**
-7. **Prepare a userdata to be utilized in Launch Template**
-8. **Write RDS database endpoint and S3 Bucket name in settings file given by Developer and push your application into your own repo on Github**
-9. **Create NAT Instance in Public Subnet**
-10. **Create Launch Template and IAM role for it**
-11. **Create certification for secure connection**
-12. **Create ALB and Target Group**
-13. **Create Autoscaling Group with Launch Template**
-14. **Create Cloudfront in front of ALB**
-15. **Create Route 53 with Failover settings**
-16. **Create DynamoDB Table**
-17. **Create Lambda function**
-18. **Create S3 Event and set it as trigger for Lambda Function**
+### Event-Driven Components
+- DynamoDB table for S3 object metadata
+- AWS Lambda function
+- S3 event notifications triggering Lambda
+
+---
+
+## Application Deployment Flow
+1. Clone application source code from the internal repository
+2. Prepare a dedicated GitHub repository for deployment
+3. Configure Django settings with:
+   - RDS endpoint
+   - S3 bucket names
+4. Create EC2 launch template with user data scripts
+5. Deploy Application Load Balancer and target groups
+6. Create Auto Scaling Group using the launch template
+7. Configure HTTPS certificates for secure access
+8. Place CloudFront distribution in front of the ALB
+9. Configure Route 53 with DNS records and failover rules
+10. Set up S3 events, Lambda, and DynamoDB integration
+
+---
 
 ## Server Specifications
+- **Operating System:** Ubuntu Server 20.04
 
-- **Operating System**: Ubuntu Server 20.04
+---
 
-## Project Skeleton 
-
+## Project Structure
 ```text
-BlogDjango (folder)
-|
-|----Readme.md               # Given to the students (Definition of the project)
-|----src (folder)            # Given to the students (Django Application's )
-|----requirements.txt        # Given to the students (txt file)
-|----lambda_function.py      # Given to the students (python file)
-|----developer_notes.txt     # Given to the students (txt file)
-
+BlogDjango
+├── README.md                # Project definition and deployment overview
+├── src/                     # Django application source code
+├── requirements.txt         # Python dependencies
+├── lambda_function.py       # Lambda function triggered by S3 events
+└── developer_notes.txt      # Deployment and configuration notes
